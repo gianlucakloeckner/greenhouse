@@ -1,4 +1,8 @@
 node {
+    environment {
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('greenhouse.firebase.json')
+        SECRET_KEY = credentials('SECRET_KEY')
+    }
     stage('Cleanup') {
         step([$class: 'WsCleanup'])
     }
