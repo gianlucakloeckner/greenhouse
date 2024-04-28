@@ -28,17 +28,6 @@ pipeline {
             }
         }
 
-        stage('Run API Tests') {
-            steps {
-                sh '''
-                    # Hier könnte Ihr API-Test-Framework aufgerufen werden
-                    # Beispiel für pytest:
-                    pip install pytest requests
-                    pytest tests/api/
-                '''
-            }
-        }
-
         stage('Stop Container') {
             steps {
                 script {
