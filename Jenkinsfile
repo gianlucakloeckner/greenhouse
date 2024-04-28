@@ -1,24 +1,55 @@
-node {
+
+pipeline {
+    agent any
     environment {
-        GOOGLE_APPLICATION_CREDENTIALS = credentials('greenhouse.firebase.json')
-        SECRET_KEY = credentials('SECRET_KEY')
+        //once you sign up for Docker hub, use that user_id here
+        registry = 'gianlucakloeckner/mypythonapp'
+        //- update your credentials ID after creating credentials for connecting to Docker Hub
+        registryCredential = 'docker-hub'
+        dockerImage = ''
     }
-    stage('Cleanup') {
-        step([$class: 'WsCleanup'])
-    }
-    stage('Checkout SCM') {
-        checkout scm
-    }
-    def pythonImage
-    stage('build docker image') {
-        pythonImage = docker.build("greenhouse:build")
-    }
-    stage('test') {
-        pythonImage.inside {
-            sh '. /tmp/venv/bin/activate && python -m pytest --junitxml=build/results.xml'
+
+    stages {
+        stage('Cloning Git') {
+            steps {
+                checkout scm
+            }
         }
-    }
-    stage('collect test results') {
-        junit 'build/results.xml'
+
+        // Building Docker images
+        stage('Building image') {
+            steps {
+                script {
+                    dockerImage = docker.build registry
+                }
+            }
+        }
+
+        // Uploading Docker images into Docker Hub
+        stage('Upload Image') {
+            steps {
+                script {
+                    /* groovylint-disable-next-line NestedBlockDepth */
+                    docker.withRegistry('', registryCredential) { dockerImage.push() }
+                }
+            }
+        }
+
+        // Stopping Docker containers for cleaner Docker run
+        stage('docker stop container') {
+            steps {
+                sh 'docker ps -f name=mypythonappContainer -q | xargs — no-run-if-empty docker container stop'
+                sh 'docker container ls -a -fname=mypythonappContainer -q | xargs -r docker container rm'
+            }
+        }
+
+        // Running Docker container, make sure port 8096 is opened in
+        stage('Docker Run') {
+            steps {
+                script {
+                    dockerImage.run('-p 8096:8000 — rm — name mypythonappContainer')
+                }
+            }
+        }
     }
 }
