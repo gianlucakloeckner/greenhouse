@@ -11,7 +11,7 @@ node {
     }
     def pythonImage
     stage('build docker image') {
-        pythonImage = docker.build("maxsum:build")
+        pythonImage = docker.build("greenhouse:build")
     }
     stage('test') {
         pythonImage.inside {
