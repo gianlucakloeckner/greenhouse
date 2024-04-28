@@ -5,7 +5,7 @@ pipeline {
     }
 
     environment {
-        PRODUCT = 'ghcli'
+        PRODUCT = 'greenhouse'
         GIT_HOST = 'somewhere'
         GIT_REPO = 'repo'
         //once you sign up for Docker hub, use that user_id here
@@ -25,11 +25,7 @@ pipeline {
         // ② Checkout the right branch
         stage('Checkout') {
             steps {
-                script {
-                    BRANCH_NAME = env.CHANGE_BRANCH ? env.CHANGE_BRANCH : env.BRANCH_NAME
-                    deleteDir()
-                    git url: "git@<host>:<org>/${env.PRODUCT}.git", branch: BRANCH_NAME
-                }
+                checkout scm
             }
         }
 
@@ -44,7 +40,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    sh "docker run --tty --name ${env.PRODUCT} ${env.PRODUCT}:py /usr/bin/make test"
+                    sh "docker run --tty --name ${env.PRODUCT} ${env.PRODUCT}:py"
                 }
             }
         }
