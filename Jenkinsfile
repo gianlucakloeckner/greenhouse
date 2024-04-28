@@ -3,12 +3,7 @@ pipeline {
         //- update your credentials ID after creating credentials for connecting to Docker Hub
         registryCredential = 'docker-hub'
     }
-    agent {
-        dockerfile {
-            filename 'Dockerfile'
-            reuseNode true
-        }
-    }
+    agent any
 
     stages {
         stage('Checkout') {
@@ -20,7 +15,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("my-python-app:${env.BUILD_ID}", '.')
+                    docker.build("my-python-app:${env.BUILD_ID}", '.').run('-p 8000:8000 --name my-running-app')
                 }
             }
         }
