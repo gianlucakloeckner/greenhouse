@@ -2,6 +2,7 @@
 
 # Verwenden des offiziellen Python-Images als Basisimage
 FROM python:3.9-slim
+RUN python3 -m venv /tmp/venv
 
 # Setzen des Arbeitsverzeichnisses innerhalb des Containers
 COPY src/ /app/src/
@@ -11,8 +12,8 @@ COPY *.json /app
 
 WORKDIR /app
 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN /tmp/venv/bin/pip install --upgrade pip
+RUN /tmp/venv/bin/pip install -r requirements.txt
 
 EXPOSE 8000
 
