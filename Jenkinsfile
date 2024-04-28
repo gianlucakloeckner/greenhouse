@@ -1,6 +1,6 @@
 
 pipeline {
-    agent docker
+    agent { dockerfile true }
     environment {
         //once you sign up for Docker hub, use that user_id here
         registry = 'gianlucakloeckner/mypythonapp'
